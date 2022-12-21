@@ -1,0 +1,37 @@
+name: 'CI'
+on:
+  push:
+  pull_request:
+    types: [ opened, reopened ]
+jobs:
+  unit-test:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: Docker version
+      run: docker version
+
+    - name: Terraform 1.0.0 compatibility
+      run: |
+        docker run -t --rm -v $(pwd):/app/ -w /app/ hashicorp/terraform:1.0.0 init
+        docker run -t --rm -v $(pwd):/app/ -w /app/ hashicorp/terraform:1.0.0 validate
+
+  deploy:
+    needs: [ unit-test ]
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'main')
+    steps:
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.17.x'
+
+      - uses: actions/checkout@v1
+
+      - name: Terraform Plan
+        run: ls
+
+      - name: Terraform Apply
+        run: ls
