@@ -29,3 +29,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "content" {
     }
   }
 }
+
+resource "aws_s3_bucket_cors_configuration" "content" {
+  bucket = aws_s3_bucket.content.id
+
+  cors_rule {
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    allowed_headers = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
